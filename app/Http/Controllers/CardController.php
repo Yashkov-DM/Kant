@@ -34,7 +34,6 @@ class CardController extends BaseController
             DB::rollBack();
             throw $exception;
         }
-        dd($cardRecord);
 
         return [
             'status' => 200,
