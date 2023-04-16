@@ -35,6 +35,8 @@
 
 ## Запуск тестов
 
+path = tests/Unit/CardGeneratorTest.php
+
 ```
 php artisan test
 ```
