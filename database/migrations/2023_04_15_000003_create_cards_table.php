@@ -15,9 +15,11 @@ return new class extends Migration
     {
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
-            $table->string('bin_card')->nullable();
-            $table->string('number_card')->nullable();
+            $table->string('bin_card');
+            $table->string('number_card');
+            $table->string('full_number_card')->unique();
             $table->timestamps();
+
         });
     }
 

@@ -17,20 +17,28 @@ class CardGeneratorTest extends TestCase
 //        $this->refreshDatabase();
 //    }
 
-    /**
-     * A basic test example.
-     */
     public function test_generate_card_true(): void
     {
-//        $this->assertTrue(true);
-//        $response = $this->get('api/generate_card/123456');
-//        dd($response->getContent());
+        $responses = Http::pool(function (Pool $pool) {
+            for ($i = 0; $i < 20; $i++) {
+                $pool->get('http://localhost:8876/api/generate_card/123456');
+            }
+        });
 
-        $responses = Http::pool(fn (Pool $pool) => [
-            $pool->get('http://localhost:9000/api/generate_card/123456'),
-        ]);
-        dd($responses);
-
-        $this->assertEquals(200, $response->status());
+        $numberCardsList = [];
+        $errors = [];
+        $count = 0;
+        foreach ($responses as $response) {
+            $record = json_decode($response->body());
+            $count++;
+            if ($record) {
+                $numberCardsList[] = $record->data->number_card;
+            } else {
+                $errors[] =  $record;
+            }
+        }
+//        dd($numberCardsList, $errors);
+        $numberCardsList = array_unique($numberCardsList);
+        $this->assertEquals($count, count($numberCardsList));
     }
 }

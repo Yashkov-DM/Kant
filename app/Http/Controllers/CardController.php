@@ -24,18 +24,17 @@ class CardController extends BaseController
             return ['status' => 400, 'messages' => $validator->messages()];
         }
 
-//        $number_card = Card::where('bin_card', $bin)->orderByDesc('number_card')->limit(1)->get('number_card');
-//        $number_card = $number_card->isEmpty() ? '0000000001' : str_pad(++$number_card[0]->number_card, 10, '0', STR_PAD_LEFT);
-//        $cardRecord = Card::create(['bin_card' => $bin, 'number_card' => $number_card]);
-
-        $cardRecord = DB::transaction(function() use ($bin)
-        {
+        DB::beginTransaction();
+        try {
             $number_card = Card::where('bin_card', $bin)->orderByDesc('number_card')->limit(1)->get('number_card');
             $number_card = $number_card->isEmpty() ? '0000000001' : str_pad(++$number_card[0]->number_card, 10, '0', STR_PAD_LEFT);
-            $cardRecord = Card::create(['bin_card' => $bin, 'number_card' => $number_card]);
-
-            return $cardRecord;
-        });
+            $cardRecord = Card::create(['bin_card' => $bin, 'number_card' => $number_card, 'full_number_card' => $bin . $number_card]);
+            DB::commit();
+        } catch(\Exception $exception){
+            DB::rollBack();
+            throw $exception;
+        }
+        dd($cardRecord);
 
         return [
             'status' => 200,
